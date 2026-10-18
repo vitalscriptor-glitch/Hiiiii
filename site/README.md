@@ -70,18 +70,25 @@ AI video prompt. **One continuous move, no cuts, no people, nothing fast.** A cu
 looks like a glitch when scrubbed. A person walking looks absurd scrubbed
 backward. Sudden exposure changes strobe as the visitor scrolls.
 
-> A single continuous aerial shot, no cuts. The camera rises slowly and steadily
-> from just above the Atlantic surface up toward a modernist concrete and glass
-> house cantilevered over a black basalt sea cliff on the Portuguese coast. Late
-> afternoon, low golden sun behind thin coastal haze. Long calm ocean swell below.
-> The house sits in the right third of the frame and stays there throughout. The
-> motion is one smooth unbroken rise, very slow, constant speed, no acceleration,
-> no camera shake, no orbit, no cuts. No people, no birds, no vehicles, no text or
-> logos. Cinematic, anamorphic, muted teal and warm gold, natural colour, shallow
-> atmospheric haze, 16:9.
+> Aerial architectural film. Continuous camera move, constant speed. The camera
+> rises slowly from just above the Atlantic surface toward a modernist concrete and
+> glass house cantilevered over a black basalt sea cliff on the Portuguese coast.
+> The house sits in the right third of frame and stays there. Late afternoon, low
+> golden sun behind thin coastal haze, long slow ocean swell below, empty sky.
+> Cinematic, anamorphic, muted teal and warm gold, natural colour, deep focus,
+> unoccupied, 16:9. Avoid: people, on-screen text, lens flare.
 
 Keep the lower third relatively plain. The property name, price and the scroll
 cue sit there, and busy footage underneath makes all three hard to read.
+
+**On phrasing.** This prompt is written positively on purpose. Google Flow has no
+negative prompt field, so words after an "Avoid:" header still reach the text
+encoder as ordinary requested words — diffusion text encoders do not process
+negation, and "no people, no birds" can summon people and birds. Control it by
+naming what you do want ("empty sky", "unoccupied") and keep the avoid tail to
+the two or three high-frequency failure modes that do respond slightly to being
+named. Enforced negatives exist only on the Gemini API / Vertex AI Veo endpoint,
+which has a real `negativePrompt` parameter.
 
 ### Prompts for the three photographs
 
