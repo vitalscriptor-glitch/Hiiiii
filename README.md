@@ -11,3 +11,7 @@ A place to collect notes and documents.
 1. Open this repository on github.com
 2. **Add file → Upload files**
 3. Pick the files, then **Commit changes**
+
+## Skills
+
+- `.claude/skills/10k-websites/` - cinematic scroll-driven website builder. Incomplete; see the folder's INCOMPLETE.md.
