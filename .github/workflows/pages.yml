@@ -1,0 +1,66 @@
+# Publishes the property sites to GitHub Pages.
+#
+# GitHub Pages can only serve from the repository root or from /docs when you
+# deploy straight from a branch, and both sites live elsewhere. So this assembles
+# them into one directory and deploys that instead, which also means neither
+# site has to move.
+#
+#   The Emirat     ->  /
+#   Casa Horizonte ->  /casa/
+#
+# One-time setup: repository Settings -> Pages -> Source -> GitHub Actions.
+
+name: Deploy sites to Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'villa/**'
+      - 'site/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it half-published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble the published tree
+        run: |
+          set -euo pipefail
+          mkdir -p _site/casa
+          cp -r villa/. _site/
+          cp -r site/.  _site/casa/
+          # the READMEs are for whoever edits the repo, not for visitors
+          rm -f _site/README.md _site/casa/README.md
+          # stop Pages running Jekyll over it
+          touch _site/.nojekyll
+          echo "published tree:"
+          find _site -type f | sort | sed 's/^/  /'
+          echo "total: $(du -sh _site | cut -f1)"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

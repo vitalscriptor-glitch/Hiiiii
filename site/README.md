@@ -128,11 +128,17 @@ sit side by side at 4:3. Different ratios will crop.
 
 No host account needed; the repository can serve it.
 
-1. Repository **Settings** → **Pages**
-2. **Source**: Deploy from a branch
-3. **Branch**: `main`, **Folder**: `/site`, then **Save**
+GitHub Pages will not serve an arbitrary folder like `/site` when deploying
+straight from a branch — only the repository root or `/docs`. So
+`.github/workflows/pages.yml` assembles the sites and deploys that instead.
 
-It goes live at `https://<user>.github.io/<repo>/` within a minute or two.
+One-time setup:
+
+1. Repository **Settings** → **Pages**
+2. **Source**: **GitHub Actions** (not "Deploy from a branch")
+
+This site then lives at `https://<user>.github.io/<repo>/casa/`, and The Emirat
+is at the root.
 
 ---
 

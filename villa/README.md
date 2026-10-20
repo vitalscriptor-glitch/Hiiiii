@@ -111,12 +111,21 @@ Two more things worth adding before this goes near real buyers:
 
 ## Publishing it free on GitHub Pages
 
-1. Repository **Settings** → **Pages**
-2. **Source**: Deploy from a branch
-3. **Branch**: `main`, **Folder**: `/villa`, then **Save**
+GitHub Pages can only serve from the repository root or from `/docs` when you
+deploy straight from a branch — it will not let you pick `/villa`. Rather than
+move the site, `.github/workflows/pages.yml` assembles both sites and deploys
+that, so no files have to shift and every push republishes.
 
-Note that `/site` (Casa Horizonte) and `/villa` cannot both be the Pages root at
-once. Pick one, or move the other under it.
+One-time setup:
+
+1. Repository **Settings** → **Pages**
+2. **Source**: **GitHub Actions** (not "Deploy from a branch")
+
+That is the whole setup. The site goes live at
+`https://<user>.github.io/<repo>/`, with Casa Horizonte at `/casa/`.
+
+The repository must be public for Pages on a free account; private repositories
+need a paid plan.
 
 ## Autoplay, and when it will not fire
 
