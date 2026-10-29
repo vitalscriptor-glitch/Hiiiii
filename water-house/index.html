@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Water House</title>
+<meta name="description" content="A five bedroom home you reach across the water, with a tall wooden door, a bright living room two floors high, and a pool that meets the sea.">
+<meta name="theme-color" content="#12100e">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The Water House">
+<meta property="og:description" content="Walk across the water. Book a free visit at sunset.">
+<meta property="og:image" content="assets/ending.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2312100e'/%3E%3Crect x='7' y='19' width='18' height='4' rx='2' fill='%23d8c6ac'/%3E%3Crect x='9.5' y='13' width='13' height='3.4' rx='1.7' fill='%23d8c6ac' opacity='.75'/%3E%3Crect x='12' y='8' width='8' height='2.8' rx='1.4' fill='%23e9b98b'/%3E%3C/svg%3E">
+
+<script>
+  // Decide before first paint whether the hero scrubs or stays a still,
+  // so the page never jumps from one layout to the other on load.
+  (function (d) {
+    var r = d.documentElement, c = navigator.connection || {};
+    r.classList.add('js');
+    var still =
+      matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      c.saveData === true || /(^|-)2g$/.test(c.effectiveType || '') ||
+      location.protocol === 'file:';
+    if (still) r.classList.add('static-hero');
+  })(document);
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=Jost:wght@300;400;500&family=Marcellus&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<div class="env" aria-hidden="true"></div>
+
+<header class="nav" data-nav>
+  <a class="mark" href="#top" aria-label="The Water House, back to top">
+    <span class="mark-en">The Water House</span>
+  </a>
+  <nav class="nav-links" aria-label="Sections">
+    <a href="#house">The house</a>
+    <a href="#rooms">Rooms</a>
+    <a href="#visit">Visit</a>
+    <a href="#faq">Questions</a>
+  </nav>
+  <a class="btn btn-small" href="#book">Book a visit</a>
+</header>
+
+<main>
+
+  <!-- HERO: the walkthrough plays forward as you scroll down, back as you scroll up -->
+  <section class="hero" id="top" aria-label="Walk through the house">
+    <div class="stage">
+      <picture>
+        <source media="(min-aspect-ratio: 1/1)" srcset="assets/poster-wide.jpg">
+        <img class="poster" src="assets/poster.jpg" alt="Stone steps cross a calm pool to the tall wooden front door of the house, at sunset" fetchpriority="high">
+      </picture>
+      <video class="film" muted playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
+      <div class="scrim" aria-hidden="true"></div>
+
+      <div class="caps" aria-live="off">
+        <p class="cap" data-in="0" data-out="1.85">
+          <span class="cap-k">01 · Arrive</span>
+          <span class="cap-h">Walk across the water.</span>
+          <span class="cap-s">Stone steps over a calm pool lead you to the door.</span>
+        </p>
+        <p class="cap" data-in="2.05" data-out="3.6">
+          <span class="cap-k">02 · The door</span>
+          <span class="cap-h">A tall wooden door.</span>
+          <span class="cap-s">It is four metres high, and it opens with one hand.</span>
+        </p>
+        <p class="cap" data-in="4.9" data-out="6.95">
+          <span class="cap-k">03 · Inside</span>
+          <span class="cap-h">A room full of light.</span>
+          <span class="cap-s">The ceiling is two floors high, and every window looks out at the water.</span>
+        </p>
+        <p class="cap" data-in="7.55" data-out="9.2">
+          <span class="cap-k">04 · Outside</span>
+          <span class="cap-h">The pool meets the sea.</span>
+          <span class="cap-s">Step outside, and the pool runs right to the edge of the water.</span>
+        </p>
+      </div>
+
+      <div class="settle" data-settle>
+        <p class="settle-k">Five bedrooms<span class="k-sep"> · </span><br class="k-br">On the water · Ready now</p>
+        <h1 class="settle-h">The Water House</h1>
+        <p class="settle-s">A home by the sea.</p>
+        <p class="settle-price">$13,200,000</p>
+        <div class="settle-cta">
+          <a class="btn" href="#book">Book a visit</a>
+          <a class="btn btn-ghost" href="#rooms">See the rooms</a>
+        </div>
+      </div>
+
+      <ol class="stones" aria-hidden="true">
+        <li></li><li></li><li></li><li></li><li></li>
+      </ol>
+
+      <div class="loader" role="status" aria-live="polite" data-loader>
+        <svg viewBox="0 0 40 40" aria-hidden="true">
+          <circle cx="20" cy="20" r="17" class="loader-track"/>
+          <circle cx="20" cy="20" r="17" class="loader-fill" pathLength="1"/>
+        </svg>
+        <span data-loader-text>Loading the video</span>
+      </div>
+
+      <p class="hint" aria-hidden="true"><span>Scroll to walk in</span><i></i></p>
+    </div>
+  </section>
+
+  <!-- INTRO + FACTS -->
+  <section class="intro" aria-labelledby="intro-h">
+    <svg class="horizon" viewBox="0 0 1200 40" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 20 H1200" pathLength="1"/>
+      <path class="horizon-glint" d="M520 20 H680" pathLength="1"/>
+    </svg>
+    <div class="wrap intro-grid">
+      <div class="reveal">
+        <p class="label">The house on the water</p>
+        <h2 id="intro-h" class="h2">Five bedrooms, one big view, and the sea right outside.</h2>
+      </div>
+      <p class="lede reveal" style="--d:.12s">A quiet home at the edge of the water. The living room faces the sunset, every bedroom has its own bathroom, and the house is ready to move into today.</p>
+    </div>
+    <ul class="wrap facts" aria-label="Key facts">
+      <li class="reveal" style="--d:0s"><strong data-count="5">5</strong><span>Bedrooms</span></li>
+      <li class="reveal" style="--d:.08s"><strong data-count="6">6</strong><span>Bathrooms</span></li>
+      <li class="reveal" style="--d:.16s"><strong data-count="910">910</strong><span>Square metres inside</span></li>
+      <li class="reveal" style="--d:.24s"><strong data-count="30">30</strong><span>Metres of private beach</span></li>
+    </ul>
+  </section>
+
+  <!-- THE HOUSE: four moments -->
+  <section class="house" id="house" aria-labelledby="house-h">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="label">The way in</p>
+        <h2 id="house-h" class="h2">The walk every guest takes.</h2>
+      </div>
+      <div class="plates">
+        <figure class="plate reveal-mask" style="--d:0s">
+          <div class="plate-img"><img src="assets/still-water.jpg" alt="Stone steps over a calm pool lead to the glass front of the house" loading="lazy" width="864" height="1080"></div>
+          <figcaption><span class="plate-n">01</span>Over the water</figcaption>
+        </figure>
+        <figure class="plate reveal-mask" style="--d:.1s">
+          <div class="plate-img"><img src="assets/still-door.jpg" alt="The tall wooden front door stands open under a dark roof" loading="lazy" width="864" height="1080"></div>
+          <figcaption><span class="plate-n">02</span>Through the door</figcaption>
+        </figure>
+        <figure class="plate reveal-mask" style="--d:.2s">
+          <div class="plate-img"><img src="assets/still-hall.jpg" alt="A bright living room two floors high, with glass lights, a floating staircase and a wall of windows onto the water" loading="lazy" width="864" height="1080"></div>
+          <figcaption><span class="plate-n">03</span>Into the light</figcaption>
+        </figure>
+        <figure class="plate reveal-mask" style="--d:.3s">
+          <div class="plate-img"><img src="assets/still-pool.jpg" alt="Open glass doors look out over a pool that meets the sea" loading="lazy" width="864" height="1080"></div>
+          <figcaption><span class="plate-n">04</span>Out to the pool</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROOMS: the interactive moment -->
+  <section class="rooms" id="rooms" aria-labelledby="rooms-h">
+    <div class="wrap rooms-grid">
+      <div class="reveal">
+        <p class="label">Room by room</p>
+        <h2 id="rooms-h" class="h2">Two floors, and the sea in view from both.</h2>
+        <p class="lede">Pick a floor to see what is on it.</p>
+        <p class="rooms-outside">Outside, there is a 22 metre pool, a shaded terrace, a garden and a private beach.</p>
+      </div>
+
+      <div class="plan reveal" style="--d:.1s" data-plan data-mode="ground">
+        <div class="toggle" role="radiogroup" aria-label="Choose a floor">
+          <button type="button" role="radio" aria-checked="true" data-mode="ground">Ground floor</button>
+          <button type="button" role="radio" aria-checked="false" data-mode="upper">Upper floor</button>
+          <span class="toggle-pill" aria-hidden="true"></span>
+        </div>
+        <dl class="rows">
+          <div class="row" data-floor="ground"><dt>Entrance hall</dt><dd data-v="45">45 m²</dd></div>
+          <div class="row" data-floor="ground"><dt>Living room, two floors high</dt><dd data-v="140">140 m²</dd></div>
+          <div class="row" data-floor="ground"><dt>Kitchen and dining room</dt><dd data-v="80">80 m²</dd></div>
+          <div class="row" data-floor="ground"><dt>Family room</dt><dd data-v="55">55 m²</dd></div>
+          <div class="row" data-floor="ground"><dt>Guest bedroom with bathroom</dt><dd data-v="40">40 m²</dd></div>
+          <div class="row is-off" data-floor="upper"><dt>Main bedroom with sea view</dt><dd data-v="90">90 m²</dd></div>
+          <div class="row is-off" data-floor="upper"><dt>Second bedroom</dt><dd data-v="45">45 m²</dd></div>
+          <div class="row is-off" data-floor="upper"><dt>Third bedroom</dt><dd data-v="42">42 m²</dd></div>
+          <div class="row is-off" data-floor="upper"><dt>Fourth bedroom</dt><dd data-v="40">40 m²</dd></div>
+          <div class="row is-off" data-floor="upper"><dt>Upstairs lounge</dt><dd data-v="50">50 m²</dd></div>
+        </dl>
+        <div class="total">
+          <span>Main rooms on this floor</span>
+          <strong><span data-total>360</span> <small>m²</small></strong>
+        </div>
+        <p class="plan-note" data-note>Every room down here opens onto the pool or the terrace.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW TO VISIT -->
+  <section class="steps" id="visit" aria-labelledby="steps-h">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="label">How to visit</p>
+        <h2 id="steps-h" class="h2">Three easy steps. Visits are always free.</h2>
+      </div>
+      <svg class="path" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M40 30 C 300 6, 420 54, 600 30 S 900 6, 1160 30" pathLength="1"/>
+      </svg>
+      <ol class="stone-steps">
+        <li class="stone reveal" style="--d:0s">
+          <span class="stone-n">01</span>
+          <h3>Send your name</h3>
+          <p>Fill in the short form below. It takes about a minute.</p>
+        </li>
+        <li class="stone reveal" style="--d:.12s">
+          <span class="stone-n">02</span>
+          <h3>We call you back</h3>
+          <p>Within the hour, by phone or message, to pick a time that suits you.</p>
+        </li>
+        <li class="stone reveal" style="--d:.24s">
+          <span class="stone-n">03</span>
+          <h3>Come and see it</h3>
+          <p>Walk through the house with one of our team. Far away? We can show you around on a live video call.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq" aria-labelledby="faq-h">
+    <div class="wrap faq-grid">
+      <div class="sec-head reveal">
+        <p class="label">Questions</p>
+        <h2 id="faq-h" class="h2">What people ask us first.</h2>
+      </div>
+      <div class="qs reveal" style="--d:.1s">
+        <details>
+          <summary>Is the house still for sale?</summary>
+          <p>Yes. It is ready now, and you can visit it this week.</p>
+        </details>
+        <details>
+          <summary>Do I have to pay to visit?</summary>
+          <p>No. Visits are always free, and we will never ask for money before you have seen the house.</p>
+        </details>
+        <details>
+          <summary>Can I visit if I live far away?</summary>
+          <p>Yes. We can walk you through every room on a live video call, at a time that suits you.</p>
+        </details>
+        <details>
+          <summary>Does the furniture come with the house?</summary>
+          <p>Yes. The house comes fully furnished, so you can move in on day one.</p>
+        </details>
+        <details>
+          <summary>Can I bring someone with me?</summary>
+          <p>Of course. Bring your family, a friend, or your own builder or lawyer.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CALL TO ACTION + FORM -->
+  <section class="cta" id="book" aria-labelledby="cta-h">
+    <div class="cta-bg" aria-hidden="true"><img src="assets/ending.jpg" alt="" loading="lazy"></div>
+    <div class="motes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="wrap cta-grid">
+      <div class="cta-copy reveal">
+        <p class="label">Visit the house</p>
+        <h2 id="cta-h" class="cta-h">Come and see it at sunset.</h2>
+        <p class="lede">We show the house every day until the sun goes down. Come for the last hour of light and watch it from the pool.</p>
+      </div>
+
+      <form class="form reveal" style="--d:.12s" data-form novalidate>
+        <div class="field">
+          <label for="f-name">Your name</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required>
+          <span class="err" aria-live="polite"></span>
+        </div>
+        <div class="field">
+          <label for="f-phone">Phone number</label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required>
+          <span class="err" aria-live="polite"></span>
+        </div>
+        <fieldset class="field chips">
+          <legend>When suits you?</legend>
+          <label><input type="radio" name="when" value="this-week" checked><span>This week</span></label>
+          <label><input type="radio" name="when" value="next-week"><span>Next week</span></label>
+          <label><input type="radio" name="when" value="video"><span>Video call</span></label>
+        </fieldset>
+        <button class="btn btn-wide" type="submit">Book my visit</button>
+        <p class="form-fine">We only use your number to set up your visit.</p>
+        <div class="form-done" role="status" aria-live="polite" hidden>
+          <p class="form-done-h">Thank you<span data-done-name></span>.</p>
+          <p>This is a sample page, so your message was not sent. On a real website it would go straight to the team, who would call you back.</p>
+        </div>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <a class="mark" href="#top" aria-label="The Water House, back to top">
+      <span class="mark-en">The Water House</span>
+    </a>
+    <p class="foot-note">The Water House is not a real home for sale. The house, the price and the details were made up to show this website design, and the video was made with AI.</p>
+  </div>
+</footer>
+
+<script src="assets/main.js" defer></script>
+</body>
+</html>

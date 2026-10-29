@@ -15,7 +15,7 @@ A place to collect notes and documents.
 ## Sites
 
 - `villa/` - The Emirat, Arabian Ranches. Published by the Pages workflow.
-- `dar-al-maa/` - Dar Al Maa, Palm Jumeirah. Scroll-driven walkthrough built on the waterfront clip. See its README.
+- `water-house/` - The Water House. Scroll-driven walkthrough built on the waterfront clip. See its README.
 
 ## Skills
 

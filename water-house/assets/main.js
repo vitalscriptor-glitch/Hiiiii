@@ -1,4 +1,4 @@
-/* Dar Al Maa
+/* The Water House
    The hero film is driven by scroll: down walks forward, up walks back.
    The page is complete without it, so every failure lands on a still. */
 (() => {
@@ -14,7 +14,8 @@
 
   const FILM_SHARE = 0.88;   // share of the hero scroll the film takes; the rest holds the last frame
   const SETTLE_AT = 0.9;     // where the name card arrives
-  const EASE = 0.12;         // how quickly the picture catches up with the scroll; lower is smoother
+  const TAU = 0.11;          // seconds the picture takes to close most of the gap to the scroll; higher is smoother
+  const HALF_FRAME = 1 / 120; // the film runs at 60 fps; nearer than half a frame needs no seek
   const REST = 0.004;        // seconds; closer than this and the loop stops
   const STALL_MS = 1500;     // a seek that takes longer than this counts as a stall
   const IDLE_MS = 15000;     // no bytes for this long and the download is abandoned
@@ -29,7 +30,9 @@
   const hint = $('.hint', hero);
   const stones = $$('.stones li', hero);
   const caps = $$('.cap', hero).map(el => ({ el, a: +el.dataset.in, b: +el.dataset.out }));
-  const src = matchMedia('(max-width: 820px)').matches ? 'assets/hero-720.mp4' : 'assets/hero-1080.mp4';
+  // Landscape screens only ever show the middle band of the tall clip, so they
+  // get a file cropped to that band at a higher resolution: sharper, and lighter.
+  const src = matchMedia('(min-aspect-ratio: 1/1)').matches ? 'assets/hero-wide.mp4' : 'assets/hero-tall.mp4';
 
   let isStatic = root.classList.contains('static-hero');
   let duration = 10;
@@ -53,7 +56,7 @@
   function seek(t) {
     t = Math.min(t, duration - 0.04);
     if (inFlight) { queued = t; return; }
-    if (Math.abs(video.currentTime - t) < 0.012) return;
+    if (Math.abs(video.currentTime - t) < HALF_FRAME) return;
     inFlight = true;
     seekStart = performance.now();
     video.currentTime = t;
@@ -96,10 +99,15 @@
     if (showHint !== lastHint) { hint.classList.toggle('is-gone', !showHint); lastHint = showHint; }
   }
 
-  function tick() {
+  // Easing is tied to real time, not to frames, so it feels the same on a
+  // 60 Hz laptop and a 120 Hz phone.
+  let lastT = 0;
+  function tick(now) {
+    const dt = lastT ? Math.min(0.1, (now - lastT) / 1000) : 1 / 60;
+    lastT = now;
     readScroll();
     const d = target - shown;
-    shown = Math.abs(d) < REST ? target : shown + d * EASE;
+    shown = Math.abs(d) < REST ? target : shown + d * (1 - Math.exp(-dt / TAU));
 
     if (ready) {
       if (inFlight && performance.now() - seekStart > STALL_MS) {
@@ -111,7 +119,7 @@
     paint();
 
     if (shown !== target) requestAnimationFrame(tick);
-    else running = false;
+    else { running = false; lastT = 0; }
   }
 
   function kick() {
@@ -131,7 +139,7 @@
     if (pct === lastPct) return;
     lastPct = pct;
     loaderFill.style.strokeDashoffset = String(1 - pct / 100);
-    loaderText.textContent = 'Loading the walkthrough · ' + pct + '%';
+    loaderText.textContent = 'Loading the video · ' + pct + '%';
   }
 
   // Fetch the whole film as one Blob, so every seek is served from memory
@@ -199,7 +207,7 @@
   }
 
   async function start() {
-    if (!video.canPlayType('video/mp4; codecs="avc1.640028"')) return goStatic('this browser cannot play H.264');
+    if (!video.canPlayType('video/mp4; codecs="avc1.64002A"')) return goStatic('this browser cannot play H.264');
     // Prefer the in-memory copy. If the download or a blob: source is refused
     // (some hosts' security rules block one or the other), stream the file directly.
     let blobUrl = null;
@@ -270,21 +278,22 @@
   }, { threshold: 0.18, rootMargin: '0px 0px -6% 0px' });
   $$('.reveal, .reveal-mask, .horizon, .path').forEach(el => io.observe(el));
 
-  /* ------------------------------------------------------------ the cost ledger */
+  /* ------------------------------------------------------------ the floor picker */
 
-  const ledger = $('[data-ledger]');
-  if (ledger) {
-    const buttons = $$('[role="radio"]', ledger);
-    const totalEl = $('[data-total]', ledger);
-    const note = $('[data-note]', ledger);
+  const plan = $('[data-plan]');
+  if (plan) {
+    const buttons = $$('[role="radio"]', plan);
+    const rows = $$('.row', plan);
+    const totalEl = $('[data-total]', plan);
+    const note = $('[data-note]', plan);
     const notes = {
-      cash: 'Paid at transfer. No other fees from us.',
-      loan: 'Assumes you borrow half the price. Bank fees vary, so we confirm yours before you make an offer.'
+      ground: 'Every room down here opens onto the pool or the terrace.',
+      upper: 'Every bedroom up here has a sea view and its own bathroom.'
     };
-    const sum = mode => $$('.row', ledger)
-      .filter(r => mode === 'loan' || !r.classList.contains('row-loan'))
+    const sum = floor => rows
+      .filter(r => r.dataset.floor === floor)
       .reduce((n, r) => n + +$('dd', r).dataset.v, 0);
-    let shownTotal = sum('cash'), anim = 0;
+    let shownTotal = sum('ground'), anim = 0;
 
     const animateTotal = to => {
       cancelAnimationFrame(anim);
@@ -292,44 +301,45 @@
       const step = now => {
         const k = clamp((now - t0) / dur, 0, 1);
         shownTotal = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
-        totalEl.textContent = shownTotal.toLocaleString('en-US');
+        totalEl.textContent = String(shownTotal);
         if (k < 1) anim = requestAnimationFrame(step);
       };
       anim = requestAnimationFrame(step);
     };
 
-    const setMode = mode => {
-      ledger.dataset.mode = mode;
+    const setFloor = floor => {
+      plan.dataset.mode = floor;
+      rows.forEach(r => r.classList.toggle('is-off', r.dataset.floor !== floor));
       buttons.forEach(b => {
-        const on = b.dataset.mode === mode;
+        const on = b.dataset.mode === floor;
         b.setAttribute('aria-checked', String(on));
         b.tabIndex = on ? 0 : -1;
       });
-      note.textContent = notes[mode];
-      animateTotal(sum(mode));
+      note.textContent = notes[floor];
+      animateTotal(sum(floor));
     };
 
     buttons.forEach((b, i) => {
-      b.addEventListener('click', () => setMode(b.dataset.mode));
+      b.addEventListener('click', () => setFloor(b.dataset.mode));
       b.addEventListener('keydown', e => {
         if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
         e.preventDefault();
         const next = buttons[(i + 1) % buttons.length];
         next.focus();
-        setMode(next.dataset.mode);
+        setFloor(next.dataset.mode);
       });
     });
     buttons[1].tabIndex = -1;
-    totalEl.textContent = shownTotal.toLocaleString('en-US');
+    totalEl.textContent = String(shownTotal);
   }
 
-  /* ------------------------------------------------------------ viewing form */
+  /* ------------------------------------------------------------ visit form */
 
   const form = $('[data-form]');
   if (form) {
     const fields = {
       name: { el: form.elements.name, ok: v => v.trim().length >= 2, msg: 'Please add your name.' },
-      phone: { el: form.elements.phone, ok: v => v.replace(/\D/g, '').length >= 7, msg: 'Please add a number we can call or WhatsApp.' }
+      phone: { el: form.elements.phone, ok: v => v.replace(/\D/g, '').length >= 7, msg: 'Please add a phone number we can call.' }
     };
     const check = key => {
       const f = fields[key];
