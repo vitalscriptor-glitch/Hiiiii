@@ -163,12 +163,12 @@
     }
   }
 
-  function attach(blob) {
+  function attach(url) {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error('video did not decode')), 12000);
       video.addEventListener('loadeddata', () => { clearTimeout(timer); resolve(); }, { once: true });
       video.addEventListener('error', () => { clearTimeout(timer); reject(new Error('video error')); }, { once: true });
-      video.src = URL.createObjectURL(blob);
+      video.src = url;
       video.load();
     });
   }
@@ -187,7 +187,11 @@
     root.classList.add('static-hero');
     root.classList.remove('is-ready');
     loader.classList.add('is-gone');
-    if (video.src) { URL.revokeObjectURL(video.src); video.removeAttribute('src'); video.load(); }
+    if (video.src) {
+      if (video.src.startsWith('blob:')) URL.revokeObjectURL(video.src);
+      video.removeAttribute('src');
+      video.load();
+    }
     measure();
     // keep the visitor where they were relative to the content below the hero
     if (scrollY > 0) scrollTo({ top: past > 0 ? hero.offsetHeight + past : 0, behavior: 'instant' });
@@ -196,12 +200,21 @@
 
   async function start() {
     if (!video.canPlayType('video/mp4; codecs="avc1.640028"')) return goStatic('this browser cannot play H.264');
+    // Prefer the in-memory copy. If the download or a blob: source is refused
+    // (some hosts' security rules block one or the other), stream the file directly.
+    let blobUrl = null;
+    try { blobUrl = URL.createObjectURL(await download(src)); } catch (e) { loader.classList.add('is-indeterminate'); }
     try {
-      const blob = await download(src);
-      await attach(blob);
+      if (blobUrl) {
+        try { await attach(blobUrl); } catch (e) { URL.revokeObjectURL(blobUrl); blobUrl = null; }
+      }
+      if (!blobUrl) await attach(src);
       await prime();
       if (isStatic) return;
       duration = video.duration || duration;
+      // a server that cannot answer range requests leaves the film unseekable
+      const sk = video.seekable;
+      if (!sk.length || sk.end(sk.length - 1) < duration - 0.5) throw new Error('video is not seekable');
       ready = true;
       readScroll();
       seek(shown);
