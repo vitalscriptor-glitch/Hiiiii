@@ -15,7 +15,7 @@ A place to collect notes and documents.
 ## Sites
 
 - `villa/` - The Emirat, Arabian Ranches. Published by the Pages workflow.
-- `water-house/` - The Water House. Scroll-driven walkthrough built on the waterfront clip. See its README.
+- `threshold-homes/` - Threshold Homes, a real estate company site with a scroll-driven walkthrough. See its README.
 
 ## Skills
 
