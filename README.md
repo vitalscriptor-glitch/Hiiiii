@@ -12,6 +12,11 @@ A place to collect notes and documents.
 2. **Add file → Upload files**
 3. Pick the files, then **Commit changes**
 
+## Sites
+
+- `villa/` - The Emirat, Arabian Ranches. Published by the Pages workflow.
+- `dar-al-maa/` - Dar Al Maa, Palm Jumeirah. Scroll-driven walkthrough built on the waterfront clip. See its README.
+
 ## Skills
 
 - `.claude/skills/10k-websites/` - cinematic scroll-driven website builder. Incomplete; see the folder's INCOMPLETE.md.
