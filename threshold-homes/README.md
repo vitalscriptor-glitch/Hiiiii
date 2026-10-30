@@ -65,6 +65,24 @@ switched off for visitors who ask their device for reduced motion.
 - **Main buttons** catch a slow sheen every few seconds and lean slightly
   toward a mouse pointer.
 
+## The front door
+
+The walk starts with the front door shut, and scrolling swings it open.
+
+Your clip opens with the pivot door already about two thirds open, so the
+closed door is drawn over the doorway from the real door's own wood
+(`assets/door-face.jpg`, taken from the first frame and straightened). The
+first 11% of the hero scroll turns it inward on its pivot in 3D, using the
+camera's centre and eye level measured from the footage, so its far edge
+shrinks the way the real one does. At 65 degrees its free edge sits exactly on
+the real door's, so it fades into the footage and the walk carries on.
+Scrolling back up closes it again.
+
+The doorway's position in the clip is in `DOORWAY` at the top of
+`assets/main.js` (in the clip's own 1080×1920 pixels). If you swap the clip,
+measure the new doorway and update those numbers, or remove the `.door`
+markup to switch the effect off.
+
 ## Advanced motion
 
 - **Brand intro.** On the first visit the name rises letter by letter over a
@@ -112,9 +130,9 @@ threshold-homes/
 └── assets/
     ├── styles.css
     ├── main.js          scroll engine (video and frames), home finder, call form
-    ├── hero-wide.mp4    laptops: 60 fps, 1600×1200, 6.6 MB
-    ├── hero-tall.mp4    backup for phones: 60 fps, 864×1536, 5.5 MB
-    ├── seq/             phones: 301 WebP frames at 720×1280 (6.6 MB) and index.json
+    ├── hero-wide.mp4    laptops: 60 fps, 1920×1440, 8.7 MB
+    ├── hero-tall.mp4    backup for phones: 30 fps, 900×1600, 5.2 MB
+    ├── seq/             phones: 301 WebP frames at 900×1600 (9.6 MB) and index.json
     ├── poster-wide.jpg  first frame, framed for wide screens
     ├── poster.jpg       first frame, full height; also the still hero
     ├── ending.jpg       last frame; behind the call section
@@ -143,6 +161,22 @@ outside request is Google Fonts.
   | 4.9 to 6.95 | the tall living room | Feel the space for yourself. |
   | 7.55 to 9.2 | the glass opens onto the pool | Then the keys are yours. |
   | end | rests on the pool and the sea | Threshold Homes and Book a free call |
+
+## Video quality
+
+Every frame of the clip was upscaled with Real-ESRGAN (the
+`realesr-general-x4v3` model, blended half and half with its weak-denoise
+twin), which cleans the compression blur and redraws edges: window frames,
+lamps, door edges and the skyline all come out crisper. It ran on the CPU
+through onnxruntime, so no paid service was used.
+
+- **Laptops:** the band a wide screen shows, upscaled from 3/4 size, then
+  rebuilt at 60 fps: 1920×1440, 8.7 MB.
+- **Phones:** the full tall frame, upscaled from half size: 301 frames at
+  900×1600, 9.6 MB in total, arriving in rounds so the walk moves within a
+  few seconds.
+- The posters, the closing background and the four "What we do" photos come
+  from the same upscaled frames.
 
 ## Swapping in a new clip
 
