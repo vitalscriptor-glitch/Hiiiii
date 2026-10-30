@@ -24,6 +24,10 @@
       c.saveData === true || /(^|-)2g$/.test(c.effectiveType || '') ||
       location.protocol === 'file:';
     if (still) r.classList.add('static-hero');
+    // the brand intro plays once per visit
+    var seen = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try { seen = seen || !!sessionStorage.getItem('th-intro'); sessionStorage.setItem('th-intro', '1'); } catch (e) {}
+    if (seen) r.classList.add('no-curtain');
   })(document);
 </script>
 
@@ -33,6 +37,11 @@
 <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
+
+<div class="curtain" aria-hidden="true">
+  <p class="curtain-mark"><span style="--i:0">T</span><span style="--i:1">h</span><span style="--i:2">r</span><span style="--i:3">e</span><span style="--i:4">s</span><span style="--i:5">h</span><span style="--i:6">o</span><span style="--i:7">l</span><span style="--i:8">d</span><span class="sp"></span><span style="--i:10">H</span><span style="--i:11">o</span><span style="--i:12">m</span><span style="--i:13">e</span><span style="--i:14">s</span></p>
+  <i class="curtain-line"></i>
+</div>
 
 <div class="env" aria-hidden="true"></div>
 
@@ -338,6 +347,7 @@
 </main>
 
 <footer class="foot">
+  <p class="foot-mark reveal" aria-hidden="true">Threshold Homes</p>
   <div class="wrap foot-grid">
     <a class="mark" href="#top" aria-label="Threshold Homes, back to top">
       <span class="mark-en">Threshold Homes</span>

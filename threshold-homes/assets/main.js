@@ -11,6 +11,34 @@
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const curtainShown = !root.classList.contains('no-curtain');
+
+  // Wrap each word, and optionally each letter, in spans so they can move on
+  // their own. A heading keeps its full text as its label and hides the
+  // pieces; anything else stays readable word by word.
+  function split(el, letters, cls) {
+    const text = el.textContent.trim();
+    const named = /^H[1-6]$/.test(el.tagName);
+    if (named) el.setAttribute('aria-label', text);
+    el.textContent = '';
+    let n = 0;
+    text.split(/\s+/).forEach((word, wi) => {
+      if (wi) el.appendChild(document.createTextNode(' '));
+      const outer = document.createElement('span');
+      outer.className = 'w';
+      if (named) outer.setAttribute('aria-hidden', 'true');
+      (letters ? [...word] : [word]).forEach(part => {
+        const inner = document.createElement('span');
+        if (letters) inner.className = 'ch';
+        inner.style.setProperty('--i', n++);
+        inner.textContent = part;
+        outer.appendChild(inner);
+      });
+      el.appendChild(outer);
+    });
+    el.classList.add(cls);
+    return n;
+  }
 
   /* ------------------------------------------------------------ hero */
 
@@ -40,6 +68,7 @@
   let progress = 0, target = 0, shown = 0;
   let running = false, engine = null;
   let lastCap = -2, lastStones = -1, lastSettle = null, lastHint = null, lastPct = -1;
+  let capsAt = 0;   // captions wait for the brand intro to lift
 
   // Read the hero's position straight from layout, so this works whichever
   // element is doing the scrolling.
@@ -58,6 +87,7 @@
       if (ci < 0 && shown >= caps[i].a && shown < caps[i].b) ci = i;
     }
     if (settled) { ci = -1; reached = stones.length; }
+    if (capsAt && performance.now() < capsAt) ci = -1;
 
     if (ci !== lastCap) {
       caps.forEach((c, i) => c.el.classList.toggle('is-on', i === ci));
@@ -406,9 +436,13 @@
     goStatic('no way to show the walk here');
   }
 
+  $$('.cap-h', hero).forEach(h => split(h, false, 'is-split'));
+  split($('.settle-h', hero), true, 'is-split');
+
   readScroll();
   shown = target;
   if (!isStatic) {
+    if (curtainShown) { capsAt = performance.now() + 1350; setTimeout(() => { lastCap = -2; kick(); }, 1400); }
     paint();
     // capture catches scrolling on the page and on any inner scrolling element
     document.addEventListener('scroll', kick, { capture: true, passive: true });
@@ -426,42 +460,52 @@
 
   /* ------------------------------------------------------------ reveals and counters */
 
-  function countUp(el) {
-    const end = +el.dataset.count;
-    const fmt = n => n.toLocaleString('en-US');
-    if (reduced || end === 0) { el.textContent = fmt(end); return; }
-    const t0 = performance.now(), dur = 1400;
-    const step = now => {
-      const k = clamp((now - t0) / dur, 0, 1);
-      el.textContent = fmt(Math.round(end * (1 - Math.pow(1 - k, 3))));
-      if (k < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }
-
-  // headings arrive word by word from behind a line
-  $$('main .h2, main .cta-h').forEach(h => {
-    const text = h.textContent.trim();
-    h.setAttribute('aria-label', text);
-    h.textContent = '';
-    text.split(/\s+/).forEach((word, i) => {
-      const outer = document.createElement('span'), inner = document.createElement('span');
-      outer.className = 'w';
-      outer.setAttribute('aria-hidden', 'true');
-      inner.style.setProperty('--i', i);
-      inner.textContent = word;
-      outer.appendChild(inner);
-      if (i) h.appendChild(document.createTextNode(' '));
-      h.appendChild(outer);
+  // promise numbers roll like an odometer: each digit spins once, then lands
+  $$('[data-count]').forEach(el => {
+    const value = el.textContent.trim();
+    el.setAttribute('aria-label', value);
+    el.textContent = '';
+    [...value].forEach((ch, c) => {
+      if (!/\d/.test(ch)) { el.appendChild(document.createTextNode(ch)); return; }
+      const odo = document.createElement('span'), col = document.createElement('span');
+      odo.className = 'odo';
+      odo.setAttribute('aria-hidden', 'true');
+      col.className = 'odo-col';
+      col.style.setProperty('--t', 10 + +ch);
+      col.style.setProperty('--c', c);
+      for (let k = 0; k < 20; k++) { const d = document.createElement('span'); d.textContent = k % 10; col.appendChild(d); }
+      odo.appendChild(col);
+      el.appendChild(odo);
     });
-    h.classList.add('split');
   });
+  // each column takes the width of the digit it lands on, so "24" does not gap
+  const fitDigits = () => $$('.odo').forEach(odo => {
+    const probe = document.createElement('span');
+    probe.textContent = odo.firstChild.style.getPropertyValue('--t') - 10;
+    probe.style.cssText = 'position:absolute;visibility:hidden';
+    odo.parentNode.appendChild(probe);
+    odo.style.width = probe.getBoundingClientRect().width.toFixed(2) + 'px';
+    probe.remove();
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitDigits); else fitDigits();
+
+  // headings arrive word by word from behind a line; the closing wordmark letter by letter
+  $$('main .h2, main .cta-h').forEach(h => split(h, false, 'split'));
+  const footMark = $('.foot-mark');
+  if (footMark) split(footMark, true, 'is-split');
+
+  // the intro paragraph lights up word by word as it is read
+  const lede = $('.intro .lede');
+  if (lede && !reduced) {
+    const n = split(lede, false, 'read');
+    lede.style.setProperty('--n', n);
+    $$('.w > span', lede).forEach(w => w.classList.add('rw'));
+  }
 
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (!e.isIntersecting) return;
       e.target.classList.add('in');
-      $$('[data-count]', e.target).forEach(countUp);
       io.unobserve(e.target);
     });
   }, { threshold: 0.18, rootMargin: '0px 0px -6% 0px' });
@@ -589,11 +633,19 @@
   }), { rootMargin: '15% 0px' });
   if (!reduced) $$('.plate-img, .cta-bg').forEach(el => dio.observe(el));
 
-  let fxQueued = false, lastPage = -1;
+  let fxQueued = false, lastPage = -1, lastExit = -1, lastRead = -1;
   function fx() {
     fxQueued = false;
     const vh = innerHeight;
     const page = clamp(scrollY / Math.max(1, root.scrollHeight - vh), 0, 1);
+    // the film recedes once the end of the walk starts to scroll away
+    const hb = hero.getBoundingClientRect().bottom;
+    const exit = reduced ? 0 : clamp(1 - hb / vh, 0, 1);
+    let read = -1;
+    if (lede && !reduced) {
+      const r = lede.getBoundingClientRect();
+      read = clamp((vh * 0.88 - r.top) / (vh * 0.38 + r.height), 0, 1);
+    }
     // read everything first, then write, so the browser lays out once
     const moves = [...drifting].map(el => {
       const r = el.getBoundingClientRect();
@@ -602,6 +654,13 @@
       return [el.querySelector('img'), (-c * amp).toFixed(1)];
     });
     if (Math.abs(page - lastPage) > 0.001) { bar.style.setProperty('--page', page.toFixed(4)); lastPage = page; }
+    if (Math.abs(exit - lastExit) > 0.002) {
+      lastExit = exit;
+      stage.style.transform = exit ? 'scale(' + (1 - exit * 0.08).toFixed(4) + ')' : '';
+      stage.style.borderRadius = exit ? (exit * 28).toFixed(1) + 'px' : '';
+      stage.style.setProperty('--exit', exit.toFixed(3));
+    }
+    if (read >= 0 && Math.abs(read - lastRead) > 0.002) { lastRead = read; lede.style.setProperty('--p', read.toFixed(3)); }
     moves.forEach(([img, y]) => { if (img && img.dataset.y !== y) { img.dataset.y = y; img.style.translate = '0 ' + y + 'px'; } });
   }
   const queueFx = () => { if (!fxQueued) { fxQueued = true; requestAnimationFrame(fx); } };
@@ -609,8 +668,86 @@
   addEventListener('resize', queueFx);
   queueFx();
 
+  // the band of home types: speeds up and leans with the scroll, and turns
+  // around when the visitor scrolls back up
+  const ticker = $('.ticker'), track = $('.ticker-track');
+  if (ticker && track && !reduced) {
+    ticker.classList.add('is-js');
+    let tx = 0, vel = 0, skew = 0, dir = 1, lastY = scrollY, last = 0, on = false, paused = false, half = 0;
+    const size = () => { half = track.scrollWidth / 2; };
+    const loop = now => {
+      if (!on) { last = 0; return; }
+      const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
+      last = now;
+      const y = scrollY;
+      vel += (y - lastY - vel) * 0.12;
+      lastY = y;
+      if (Math.abs(vel) > 0.6) dir = vel > 0 ? 1 : -1;
+      tx -= dir * (paused ? 0 : 36 + Math.min(Math.abs(vel) * 55, 900)) * dt;
+      if (half) { while (tx <= -half) tx += half; while (tx > 0) tx -= half; }
+      skew += (clamp(-vel * 0.35, -9, 9) - skew) * 0.15;
+      track.style.transform = 'translate3d(' + tx.toFixed(1) + 'px,0,0) skewX(' + skew.toFixed(2) + 'deg)';
+      requestAnimationFrame(loop);
+    };
+    new IntersectionObserver(([e]) => {
+      const was = on;
+      on = e.isIntersecting;
+      if (on && !was) { size(); lastY = scrollY; requestAnimationFrame(loop); }
+    }).observe(ticker);
+    addEventListener('resize', size);
+    ticker.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') paused = true; });
+    ticker.addEventListener('pointerleave', () => { paused = false; });
+  }
+
+  // the brand intro removes itself once it has lifted
+  const curtain = $('.curtain');
+  if (curtain) {
+    if (!curtainShown || reduced) curtain.remove();
+    else curtain.addEventListener('animationend', e => { if (e.animationName === 'curtain-up') curtain.remove(); });
+  }
+
   // with a mouse: a soft light follows the pointer, and buttons lean toward it
   if (!reduced && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    // service cards tilt toward the pointer
+    $$('.plate-link').forEach(card => {
+      card.addEventListener('pointermove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+        card.classList.add('is-tilting');
+        card.style.transform = 'perspective(900px) rotateX(' + (-y * 7).toFixed(2) + 'deg) rotateY(' + (x * 9).toFixed(2) + 'deg)';
+      }, { passive: true });
+      card.addEventListener('pointerleave', () => { card.classList.remove('is-tilting'); card.style.transform = ''; });
+    });
+
+    // a ring follows the mouse, a little behind, and opens up over the cards
+    const cur = document.createElement('div');
+    cur.className = 'cursor';
+    cur.setAttribute('aria-hidden', 'true');
+    cur.innerHTML = '<span class="cursor-label">Open</span>';
+    document.body.appendChild(cur);
+    let mx = 0, my = 0, cx = 0, cy = 0, curRunning = false, curState = '';
+    const curLoop = () => {
+      cx += (mx - cx) * 0.2;
+      cy += (my - cy) * 0.2;
+      cur.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0)';
+      if (Math.abs(mx - cx) + Math.abs(my - cy) > 0.3) requestAnimationFrame(curLoop);
+      else curRunning = false;
+    };
+    addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse') return;
+      mx = e.clientX; my = e.clientY;
+      if (!cur.classList.contains('is-on')) { cx = mx; cy = my; cur.classList.add('is-on'); }
+      const t = e.target.closest ? e.target.closest('[data-card], .btn, a, button, summary, label') : null;
+      const state = !t ? '' : t.matches('[data-card]') ? 'is-card' : t.matches('.btn') ? 'is-btn' : 'is-link';
+      if (state !== curState) {
+        if (curState) cur.classList.remove(curState);
+        if (state) cur.classList.add(state);
+        curState = state;
+      }
+      if (!curRunning) { curRunning = true; requestAnimationFrame(curLoop); }
+    }, { passive: true });
+    root.addEventListener('pointerleave', () => cur.classList.remove('is-on'));
+
     $$('.plate-img, .panel, .stone, .form').forEach(el => el.addEventListener('pointermove', e => {
       const r = el.getBoundingClientRect();
       el.style.setProperty('--mx', (e.clientX - r.left).toFixed(0) + 'px');
