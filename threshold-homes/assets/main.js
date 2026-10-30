@@ -42,8 +42,10 @@
 
   /* ------------------------------------------------------------ hero */
 
-  const FILM_SHARE = 0.88;   // share of the hero scroll the walk takes; the rest holds the last frame
-  const SETTLE_AT = 0.9;     // where the name card arrives
+  const DOOR_END = 0.11;     // the first part of the hero scroll opens the front door
+  const FILM_END = 0.9;      // the walk runs from there to here; the rest holds the last frame
+  const SETTLE_AT = 0.92;    // where the name card arrives
+  const OPEN_DEG = 65;       // how far the real door stands open in the first frame
   const TAU = 0.11;          // seconds the picture takes to close most of the gap to the scroll; higher is smoother
   const REST = 0.004;        // seconds; closer than this and the loop stops
   const IDLE_MS = 15000;     // no bytes for this long and a download is abandoned
@@ -59,6 +61,12 @@
   const hint = $('.hint', hero);
   const stones = $$('.stones li', hero);
   const caps = $$('.cap', hero).map(el => ({ el, a: +el.dataset.in, b: +el.dataset.out }));
+  const door = $('.door', hero);
+  const doorDim = $('.door-dim', hero);
+  // Where the doorway sits in the clip's first frame, in the clip's own pixels
+  // (1080 x 1920), with the camera's centre and eye level measured from the
+  // real door's perspective. Laptops show the band from y = 500 to 1310.
+  const DOORWAY = { x: 427, y: 680, w: 235, h: 419, cam: 540, eye: 1090, depth: 2740 };
 
   const touch = matchMedia('(hover: none) and (pointer: coarse)').matches;
   const wide = matchMedia('(min-aspect-ratio: 1/1)').matches;
@@ -66,6 +74,7 @@
   let isStatic = root.classList.contains('static-hero');
   let duration = 10;
   let progress = 0, target = 0, shown = 0;
+  let doorTarget = 0, doorShown = 0, lastDoor = -1;
   let running = false, engine = null;
   let lastCap = -2, lastStones = -1, lastSettle = null, lastHint = null, lastPct = -1;
   let capsAt = 0;   // captions wait for the brand intro to lift
@@ -75,7 +84,8 @@
   function readScroll() {
     const r = hero.getBoundingClientRect();
     progress = clamp(-r.top / Math.max(1, r.height - stage.offsetHeight), 0, 1);
-    target = clamp(progress / FILM_SHARE, 0, 1) * duration;
+    doorTarget = clamp(progress / DOOR_END, 0, 1);
+    target = clamp((progress - DOOR_END) / (FILM_END - DOOR_END), 0, 1) * duration;
   }
 
   // DOM writes only when something visible changes.
@@ -107,6 +117,41 @@
     }
     const showHint = progress < 0.012;
     if (showHint !== lastHint) { hint.classList.toggle('is-gone', !showHint); lastHint = showHint; }
+
+    if (door && Math.abs(doorShown - lastDoor) > 0.0008) {
+      lastDoor = doorShown;
+      const o = doorShown < 0.5 ? 4 * doorShown ** 3 : 1 - (-2 * doorShown + 2) ** 3 / 2;   // ease in and out
+      door.style.setProperty('--a', (OPEN_DEG * o).toFixed(2));
+      door.style.setProperty('--o', o.toFixed(3));
+      // at full swing the drawn door matches the real one, so it fades into the footage
+      door.style.setProperty('--door-o', (1 - clamp((doorShown - 0.9) / 0.1, 0, 1)).toFixed(3));
+      doorDim.style.opacity = ((1 - o) * 0.85).toFixed(3);
+    }
+  }
+
+  // Lay the drawn door exactly over the doorway in whichever picture is showing.
+  function placeDoor() {
+    if (!door) return;
+    const W = stage.clientWidth, H = stage.clientHeight;
+    const band = wide && root.dataset.engine !== 'frames';
+    const mw = 1080, mh = band ? 810 : 1920, top = band ? 500 : 0, py = band ? 0.5 : 0.45;
+    const s = Math.max(W / mw, H / mh);
+    const x = (W - mw * s) * 0.5 + DOORWAY.x * s;
+    const y = (H - mh * s) * py + (DOORWAY.y - top) * s;
+    const w = DOORWAY.w * s, h = DOORWAY.h * s;
+    const set = (el, props) => Object.keys(props).forEach(k => el.style.setProperty(k, props[k]));
+    set(door, {
+      '--dx': x.toFixed(1) + 'px', '--dy': y.toFixed(1) + 'px',
+      '--dw': w.toFixed(1) + 'px', '--dh': h.toFixed(1) + 'px',
+      '--dp': (DOORWAY.depth * s).toFixed(0) + 'px',
+      '--pox': ((DOORWAY.cam - DOORWAY.x) * s).toFixed(1) + 'px',
+      '--poy': ((DOORWAY.eye - DOORWAY.y) * s).toFixed(1) + 'px',
+      '--dt': (10 * s).toFixed(1) + 'px'
+    });
+    set(doorDim, {
+      '--gx': (x - w * 0.6).toFixed(1) + 'px', '--gy': (y + h * 0.95).toFixed(1) + 'px',
+      '--gw': (w * 2.2).toFixed(1) + 'px', '--gh': (h * 0.75).toFixed(1) + 'px'
+    });
   }
 
   // Easing is tied to real time, not to frames, so it feels the same on a
@@ -116,14 +161,17 @@
     const dt = lastT ? Math.min(0.1, (now - lastT) / 1000) : 1 / 60;
     lastT = now;
     readScroll();
+    const k = 1 - Math.exp(-dt / TAU);
     const d = target - shown;
-    shown = Math.abs(d) < REST ? target : shown + d * (1 - Math.exp(-dt / TAU));
+    shown = Math.abs(d) < REST ? target : shown + d * k;
+    const dd = doorTarget - doorShown;
+    doorShown = Math.abs(dd) < 0.001 ? doorTarget : doorShown + dd * k;
 
     if (engine && engine.ready) engine.show(shown, now);
     if (isStatic) { running = false; return; }
     paint();
 
-    if (shown !== target) requestAnimationFrame(tick);
+    if (shown !== target || doorShown !== doorTarget) requestAnimationFrame(tick);
     else { running = false; lastT = 0; }
   }
 
@@ -136,6 +184,7 @@
   function reveal(kind) {
     root.dataset.engine = kind;
     root.classList.add('is-ready');
+    placeDoor();
   }
 
   function showProgress(f) {
@@ -441,12 +490,14 @@
 
   readScroll();
   shown = target;
+  doorShown = doorTarget;
   if (!isStatic) {
+    placeDoor();
     if (curtainShown) { capsAt = performance.now() + 1350; setTimeout(() => { lastCap = -2; kick(); }, 1400); }
     paint();
     // capture catches scrolling on the page and on any inner scrolling element
     document.addEventListener('scroll', kick, { capture: true, passive: true });
-    addEventListener('resize', kick);
+    addEventListener('resize', () => { placeDoor(); lastDoor = -1; kick(); });
     addEventListener('pageshow', kick);
     start();
   }

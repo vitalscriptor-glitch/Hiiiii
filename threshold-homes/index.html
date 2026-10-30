@@ -70,6 +70,11 @@
       </picture>
       <video class="film" muted playsinline preload="none" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
       <canvas class="reel" aria-hidden="true"></canvas>
+      <!-- the front door starts closed and swings open as you scroll -->
+      <div class="door-dim" aria-hidden="true"></div>
+      <div class="door" aria-hidden="true">
+        <div class="door-leaf"><i class="door-edge"></i><i class="door-sheen"></i></div>
+      </div>
       <div class="scrim" aria-hidden="true"></div>
 
       <div class="caps" aria-live="off">
@@ -118,7 +123,7 @@
         <span data-loader-text>Loading</span>
       </div>
 
-      <p class="hint" aria-hidden="true"><span>Scroll to walk in</span><i></i></p>
+      <p class="hint" aria-hidden="true"><span>Scroll to open the door</span><i></i></p>
     </div>
   </section>
 

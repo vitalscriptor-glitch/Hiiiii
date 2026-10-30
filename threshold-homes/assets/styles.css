@@ -24,7 +24,7 @@
   --ease-out: cubic-bezier(.16, 1, .3, 1);
 
   --gutter: clamp(16px, 4vw, 48px);
-  --scrub: 520vh;                 /* how far you scroll to walk the whole film */
+  --scrub: 590vh;                 /* how far you scroll to open the door and walk the whole film */
   --cap-bottom: clamp(84px, 14vh, 150px);
 }
 
@@ -298,6 +298,63 @@ h1, h2, h3, p { margin: 0; }
 }
 .cap.is-on::before, .settle.is-on::before, .static-hero .settle::before { opacity: 1; transition-duration: .9s; }
 
+
+/* ---------- the front door ----------
+   The clip opens with the door already part open, so a closed door is drawn
+   over the doorway from the real door's own wood. Scrolling swings it open on
+   its pivot until it sits exactly where the real door stands in the first
+   frame, then it fades into the footage and the walk begins. */
+.door, .door-dim { position: absolute; left: 0; top: 0; pointer-events: none; }
+.door {
+  width: var(--dw, 0px);
+  height: var(--dh, 0px);
+  translate: var(--dx, 0px) var(--dy, 0px);
+  perspective: var(--dp, 2000px);
+  perspective-origin: var(--pox, 50%) var(--poy, 98%);
+  opacity: var(--door-o, 1);
+}
+.door-leaf {
+  position: absolute;
+  inset: 0;
+  background: url("door-face.jpg") center / 100% 100% no-repeat, #4a2a18;
+  transform-origin: 18% 50%;
+  transform: rotateY(calc(var(--a, 0) * 1deg));
+  transform-style: preserve-3d;
+  box-shadow: inset 0 0 0 1px rgba(14, 9, 6, .6), inset 0 -60px 80px -50px rgba(10, 6, 4, .55);
+}
+.door-leaf::before {
+  /* fine vertical grain, and the face darkening a little as it turns from the light */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(20, 10, 4, .05) 0 1px, transparent 1px 6px, rgba(255, 220, 180, .025) 6px 7px, transparent 7px 13px),
+    linear-gradient(90deg, rgba(10, 6, 4, calc(var(--o, 0) * .25)), rgba(10, 6, 4, calc(var(--o, 0) * .1)));
+}
+.door-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 38%, rgba(255, 214, 170, .12) 50%, transparent 62%) no-repeat;
+  background-size: 300% 100%;
+  background-position: calc(100% - var(--o, 0) * 100%) 0;
+}
+.door-edge {
+  position: absolute;
+  top: 0; bottom: 0; right: 0;
+  width: var(--dt, 10px);
+  background: linear-gradient(90deg, #2b1910, #45291a);
+  transform-origin: 100% 50%;
+  transform: rotateY(-90deg);
+}
+.door-dim {
+  /* with the door shut, less of the room's warm light falls on the step */
+  width: var(--gw, 0px);
+  height: var(--gh, 0px);
+  translate: var(--gx, 0px) var(--gy, 0px);
+  background: radial-gradient(ellipse at 50% 0%, rgba(14, 10, 7, .6), rgba(14, 10, 7, 0) 70%);
+}
+.static-hero .door, .static-hero .door-dim { display: none; }
+
 /* the settle: the film rests on the pool, the name arrives */
 .settle {
   display: grid;
@@ -408,6 +465,7 @@ h1, h2, h3, p { margin: 0; }
   font: 400 .68rem/1 var(--mono);
   letter-spacing: .2em;
   text-transform: uppercase;
+  white-space: nowrap;
   color: rgba(239, 230, 216, .7);
   transition: opacity .6s var(--ease);
 }
@@ -728,7 +786,7 @@ section:not(.hero) { padding-block: clamp(52px, 7vw, 100px); }
   .foot-grid { flex-direction: column; }
 }
 @media (max-width: 560px) {
-  :root { --scrub: 440vh; --cap-bottom: clamp(76px, 12vh, 120px); }
+  :root { --scrub: 500vh; --cap-bottom: clamp(76px, 12vh, 120px); }
   .mark-en { font-size: .8rem; letter-spacing: .2em; }
   .btn-small { padding: .62rem .9rem; font-size: .8rem; }
   .stones { right: 12px; gap: 9px; }

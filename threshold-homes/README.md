@@ -65,6 +65,27 @@ switched off for visitors who ask their device for reduced motion.
 - **Main buttons** catch a slow sheen every few seconds and lean slightly
   toward a mouse pointer.
 
+## Advanced motion
+
+- **Brand intro.** On the first visit the name rises letter by letter over a
+  gold line, then the curtain lifts (about 2 seconds, once per visit, never
+  with reduced motion). The walk's first caption waits for it.
+- **Walk captions** rise word by word out of a blur. The company name on the
+  closing card arrives letter by letter.
+- **Leaving the walk**, the film recedes into a rounded card as the page slides
+  over it.
+- **The intro paragraph** lights up word by word as you read down.
+- **Promise numbers** roll like an odometer and land on 24, 7, 0 and 1.
+- **Service cards** tilt toward the mouse, and their photos develop from grey
+  into colour as they appear.
+- **A ring follows the mouse**, opens to "Open" over the service cards and
+  steps aside for buttons.
+- **The band of home types** speeds up and leans as you scroll, and turns
+  around when you scroll back up.
+- **The three steps** stack on top of each other like stones on phones and
+  tablets.
+- **A large outlined wordmark** rises letter by letter in the footer.
+
 ## How the walk plays on each screen
 
 | Screen | What plays | Why |
