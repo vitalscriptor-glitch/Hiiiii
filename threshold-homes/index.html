@@ -46,7 +46,8 @@
     <a href="#how">How it works</a>
     <a href="#faq">Questions</a>
   </nav>
-  <a class="btn btn-small" href="#book">Book a free call</a>
+  <a class="btn btn-small btn-sheen" href="#book">Book a free call</a>
+  <span class="nav-progress" aria-hidden="true"></span>
 </header>
 
 <main>
@@ -91,7 +92,7 @@
         <p class="settle-s">Every kind of home, and one simple way in.</p>
         <p class="settle-offer">Free home valuation in 24 hours</p>
         <div class="settle-cta">
-          <a class="btn" href="#book">Book a free call</a>
+          <a class="btn btn-sheen" href="#book">Book a free call</a>
           <a class="btn btn-ghost" href="#find">Find a home</a>
         </div>
       </div>
@@ -131,6 +132,12 @@
       <li class="reveal" style="--d:.16s"><strong data-count="0">0</strong><span>Fees for home buyers</span></li>
       <li class="reveal" style="--d:.24s"><strong data-count="1">1</strong><span>Person who looks after you, start to finish</span></li>
     </ul>
+    <div class="ticker" aria-label="Homes we help with: apartments, family houses, villas, townhouses, new builds, studios, penthouses and country homes">
+      <div class="ticker-track" aria-hidden="true">
+        <ul><li>Apartments</li><li>Family houses</li><li>Villas</li><li>Townhouses</li><li>New builds</li><li>Studios</li><li>Penthouses</li><li>Country homes</li></ul>
+        <ul><li>Apartments</li><li>Family houses</li><li>Villas</li><li>Townhouses</li><li>New builds</li><li>Studios</li><li>Penthouses</li><li>Country homes</li></ul>
+      </div>
+    </div>
   </section>
 
   <!-- WHAT WE DO -->
@@ -141,38 +148,46 @@
         <h2 id="services-h" class="h2">One team for every move.</h2>
       </div>
       <div class="plates">
-        <figure class="plate reveal-mask" style="--d:0s">
-          <div class="plate-img"><img src="assets/still-door.jpg" alt="A tall wooden front door stands open onto a bright hall" loading="lazy" width="864" height="1080"></div>
-          <figcaption>
-            <span class="plate-n">Buy</span>
-            <span class="plate-t">Buy a home</span>
-            <span class="plate-p">We find homes that fit your life and your budget, and come to every visit with you.</span>
-          </figcaption>
-        </figure>
-        <figure class="plate reveal-mask" style="--d:.1s">
-          <div class="plate-img"><img src="assets/still-hall.jpg" alt="A bright living room two floors high, with big windows onto the water" loading="lazy" width="864" height="1080"></div>
-          <figcaption>
-            <span class="plate-n">Sell</span>
-            <span class="plate-t">Sell your home</span>
-            <span class="plate-p">Beautiful photos and video, and buyers who are ready to move.</span>
-          </figcaption>
-        </figure>
-        <figure class="plate reveal-mask" style="--d:.2s">
-          <div class="plate-img"><img src="assets/still-water.jpg" alt="Stone steps over a calm pool lead to the front of a modern home" loading="lazy" width="864" height="1080"></div>
-          <figcaption>
-            <span class="plate-n">Rent</span>
-            <span class="plate-t">Rent a home</span>
-            <span class="plate-p">Checked homes, fair prices and contracts written in plain words.</span>
-          </figcaption>
-        </figure>
-        <figure class="plate reveal-mask" style="--d:.3s">
-          <div class="plate-img"><img src="assets/still-pool.jpg" alt="Open glass doors look out over a pool and the sea" loading="lazy" width="864" height="1080"></div>
-          <figcaption>
-            <span class="plate-n">Value</span>
-            <span class="plate-t">Know what it is worth</span>
-            <span class="plate-p">A free, honest price for your home within 24 hours.</span>
-          </figcaption>
-        </figure>
+        <div class="plate reveal-mask" style="--d:0s">
+          <a class="plate-link" href="#find" data-mode="buy" data-card>
+            <div class="plate-img"><img src="assets/still-door.jpg" alt="A tall wooden front door stands open onto a bright hall" loading="lazy" width="864" height="1080"></div>
+            <div class="plate-cap">
+              <span class="plate-n">Buy</span>
+              <span class="plate-t">Buy a home <i class="arr" aria-hidden="true"></i></span>
+              <span class="plate-p">We find homes that fit your life and your budget, and come to every visit with you.</span>
+            </div>
+          </a>
+        </div>
+        <div class="plate reveal-mask" style="--d:.1s">
+          <a class="plate-link" href="#book" data-want="sell" data-card>
+            <div class="plate-img"><img src="assets/still-hall.jpg" alt="A bright living room two floors high, with big windows onto the water" loading="lazy" width="864" height="1080"></div>
+            <div class="plate-cap">
+              <span class="plate-n">Sell</span>
+              <span class="plate-t">Sell your home <i class="arr" aria-hidden="true"></i></span>
+              <span class="plate-p">Beautiful photos and video, and buyers who are ready to move.</span>
+            </div>
+          </a>
+        </div>
+        <div class="plate reveal-mask" style="--d:.2s">
+          <a class="plate-link" href="#find" data-mode="rent" data-card>
+            <div class="plate-img"><img src="assets/still-water.jpg" alt="Stone steps over a calm pool lead to the front of a modern home" loading="lazy" width="864" height="1080"></div>
+            <div class="plate-cap">
+              <span class="plate-n">Rent</span>
+              <span class="plate-t">Rent a home <i class="arr" aria-hidden="true"></i></span>
+              <span class="plate-p">Checked homes, fair prices and contracts written in plain words.</span>
+            </div>
+          </a>
+        </div>
+        <div class="plate reveal-mask" style="--d:.3s">
+          <a class="plate-link" href="#book" data-want="sell" data-need="A free valuation of my home" data-card>
+            <div class="plate-img"><img src="assets/still-pool.jpg" alt="Open glass doors look out over a pool and the sea" loading="lazy" width="864" height="1080"></div>
+            <div class="plate-cap">
+              <span class="plate-n">Value</span>
+              <span class="plate-t">Know what it is worth <i class="arr" aria-hidden="true"></i></span>
+              <span class="plate-p">A free, honest price for your home within 24 hours.</span>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -209,7 +224,7 @@
           <label><input type="radio" name="beds" value="5+"><span>5+</span></label>
         </fieldset>
         <p class="finder-sum" aria-live="polite">You are looking for <strong data-sum>a 3 bedroom house to buy</strong>.</p>
-        <a class="btn btn-wide" href="#book" data-finder-go>Find me this home</a>
+        <a class="btn btn-wide btn-sheen" href="#book" data-finder-go>Find me this home</a>
       </div>
     </div>
   </section>
@@ -223,6 +238,7 @@
       </div>
       <svg class="path" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden="true">
         <path d="M40 30 C 300 6, 420 54, 600 30 S 900 6, 1160 30" pathLength="1"/>
+        <path class="path-glint" d="M40 30 C 300 6, 420 54, 600 30 S 900 6, 1160 30" pathLength="1"/>
       </svg>
       <ol class="stone-steps">
         <li class="stone reveal" style="--d:0s">
@@ -308,9 +324,10 @@
           <label for="f-need">What are you looking for? <span class="opt-note">(optional)</span></label>
           <input id="f-need" name="need" type="text" placeholder="For example: a 3 bedroom house near a school">
         </div>
-        <button class="btn btn-wide" type="submit">Book my free call</button>
+        <button class="btn btn-wide btn-sheen" type="submit">Book my free call</button>
         <p class="form-fine">We only use your number to call you back.</p>
         <div class="form-done" role="status" aria-live="polite" hidden>
+          <svg class="done-check" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24" pathLength="1"/><path d="M15 27 l7.5 7.5 L37 19" pathLength="1"/></svg>
           <p class="form-done-h">Thank you<span data-done-name></span>.</p>
           <p>This is a sample website, so your message was not sent. On a real website it would go straight to our team, who would call you back.</p>
         </div>

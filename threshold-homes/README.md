@@ -40,6 +40,31 @@ range requests (http-server does). Double-clicking `index.html` shows the
 still-image version of the hero, because browsers will not let a local file
 load the walk. That is the fallback working, not a fault.
 
+## Motion below the walk
+
+One idea runs through every section: things rise over a line, the way you step
+over a threshold. Everything uses transform and opacity only, and all of it is
+switched off for visitors who ask their device for reduced motion.
+
+- **Headings** arrive word by word from behind a line.
+- **Promises** each draw their own line and a short gold mark, and the numbers
+  count up.
+- **A slow band of home types** (apartments, family houses, villas, townhouses
+  and more) runs under the promises, and pauses under a mouse.
+- **Service cards** reveal from the bottom, their photos drift a little slower
+  than the page, a soft light follows the pointer, and an arrow steps in.
+  Buy and Rent open the home finder set to that choice; Sell and Value open the
+  call form set up for a seller.
+- **Home finder** chips press in, and the summary line rises when it changes.
+- **Steps** lift under the pointer, and a gold light runs along the path
+  between them.
+- **Questions** slide their answers in.
+- **Call form** fields arrive one after another; sending it draws a check mark.
+- **Menu** shows a thin gold line for how far down the page you are and
+  underlines the section you are reading.
+- **Main buttons** catch a slow sheen every few seconds and lean slightly
+  toward a mouse pointer.
+
 ## How the walk plays on each screen
 
 | Screen | What plays | Why |

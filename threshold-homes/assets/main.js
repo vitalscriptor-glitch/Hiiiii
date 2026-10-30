@@ -439,6 +439,24 @@
     requestAnimationFrame(step);
   }
 
+  // headings arrive word by word from behind a line
+  $$('main .h2, main .cta-h').forEach(h => {
+    const text = h.textContent.trim();
+    h.setAttribute('aria-label', text);
+    h.textContent = '';
+    text.split(/\s+/).forEach((word, i) => {
+      const outer = document.createElement('span'), inner = document.createElement('span');
+      outer.className = 'w';
+      outer.setAttribute('aria-hidden', 'true');
+      inner.style.setProperty('--i', i);
+      inner.textContent = word;
+      outer.appendChild(inner);
+      if (i) h.appendChild(document.createTextNode(' '));
+      h.appendChild(outer);
+    });
+    h.classList.add('split');
+  });
+
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (!e.isIntersecting) return;
@@ -453,6 +471,7 @@
 
   const form = $('[data-form]');
   const finder = $('[data-finder]');
+  let setFinderMode = null;
   if (finder) {
     const buttons = $$('[role="radio"]', finder);
     const sumEl = $('[data-sum]', finder);
@@ -463,7 +482,13 @@
       const goal = finder.dataset.mode === 'rent' ? 'to rent' : 'to buy';
       return 'a ' + beds + ' bedroom ' + type + ' ' + goal;
     };
-    const update = () => { sumEl.textContent = summary(); };
+    const update = () => {
+      sumEl.textContent = summary();
+      if (reduced) return;
+      sumEl.classList.remove('bump');
+      void sumEl.offsetWidth;   // restart the animation
+      sumEl.classList.add('bump');
+    };
 
     const setMode = mode => {
       finder.dataset.mode = mode;
@@ -487,6 +512,7 @@
     });
     buttons[1].tabIndex = -1;
     finder.addEventListener('change', update);
+    setFinderMode = setMode;
 
     // carry the visitor's choices into the call form below
     $('[data-finder-go]', finder).addEventListener('click', () => {
@@ -530,6 +556,73 @@
       form.classList.add('is-done');
       done.setAttribute('tabindex', '-1');
       done.focus({ preventScroll: true });
+    });
+  }
+
+  /* ------------------------------------------------------------ service cards */
+
+  // Buy and Rent open the finder ready for that choice; Sell and Value open
+  // the call form ready for a seller.
+  $$('[data-card]').forEach(card => card.addEventListener('click', () => {
+    if (card.dataset.mode && setFinderMode) setFinderMode(card.dataset.mode);
+    if (card.dataset.want && form) {
+      $('input[name="want"][value="' + card.dataset.want + '"]', form).checked = true;
+      form.elements.need.value = card.dataset.need || '';
+    }
+  }));
+
+  /* ------------------------------------------------------------ finishing motion */
+
+  // which section the menu should highlight: the one crossing the middle of the screen
+  const links = new Map($$('.nav-links a').map(a => [a.getAttribute('href').slice(1), a]));
+  const spy = new IntersectionObserver(entries => entries.forEach(e => {
+    const a = links.get(e.target.id);
+    if (a) a.classList.toggle('is-active', e.isIntersecting);
+  }), { rootMargin: '-45% 0px -54% 0px' });
+  links.forEach((a, id) => { const el = document.getElementById(id); if (el) spy.observe(el); });
+
+  // images drift a little slower than the page; only the ones on screen are touched
+  const bar = $('.nav-progress');
+  const drifting = new Set();
+  const dio = new IntersectionObserver(entries => entries.forEach(e => {
+    if (e.isIntersecting) drifting.add(e.target); else drifting.delete(e.target);
+  }), { rootMargin: '15% 0px' });
+  if (!reduced) $$('.plate-img, .cta-bg').forEach(el => dio.observe(el));
+
+  let fxQueued = false, lastPage = -1;
+  function fx() {
+    fxQueued = false;
+    const vh = innerHeight;
+    const page = clamp(scrollY / Math.max(1, root.scrollHeight - vh), 0, 1);
+    // read everything first, then write, so the browser lays out once
+    const moves = [...drifting].map(el => {
+      const r = el.getBoundingClientRect();
+      const c = clamp((r.top + r.height / 2 - vh / 2) / vh, -1, 1);
+      const amp = el.classList.contains('cta-bg') ? r.height * 0.07 : r.height * 0.035;
+      return [el.querySelector('img'), (-c * amp).toFixed(1)];
+    });
+    if (Math.abs(page - lastPage) > 0.001) { bar.style.setProperty('--page', page.toFixed(4)); lastPage = page; }
+    moves.forEach(([img, y]) => { if (img && img.dataset.y !== y) { img.dataset.y = y; img.style.translate = '0 ' + y + 'px'; } });
+  }
+  const queueFx = () => { if (!fxQueued) { fxQueued = true; requestAnimationFrame(fx); } };
+  document.addEventListener('scroll', queueFx, { capture: true, passive: true });
+  addEventListener('resize', queueFx);
+  queueFx();
+
+  // with a mouse: a soft light follows the pointer, and buttons lean toward it
+  if (!reduced && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    $$('.plate-img, .panel, .stone, .form').forEach(el => el.addEventListener('pointermove', e => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (e.clientX - r.left).toFixed(0) + 'px');
+      el.style.setProperty('--my', (e.clientY - r.top).toFixed(0) + 'px');
+    }, { passive: true }));
+    $$('.btn').forEach(b => {
+      b.addEventListener('pointermove', e => {
+        const r = b.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+        b.style.translate = (x * 10).toFixed(1) + 'px ' + (y * 6).toFixed(1) + 'px';
+      }, { passive: true });
+      b.addEventListener('pointerleave', () => { b.style.translate = ''; });
     });
   }
 })();
